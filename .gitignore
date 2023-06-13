@@ -1,0 +1,14 @@
+# Verzeichnisse
+.venv/              # Virtuelle Umgebung
+__pycache__/       # Python Bytecode-Dateien
+instance/          # Instanzspezifische Konfigurationsdateien
+
+# Dateien
+*.pyc              # Kompilierte Python-Dateien
+*.pyo              # Optimierter Python-Code
+*.pyd              # Python-C-Extension-Dateien
+*.db               # Datenbankdateien
+*.log              # Logdateien
+*.swp              # Vim-Swap-Dateien
+*.swo              # Vim-Swap-Dateien
+.env               # Umgebungsvariablen
