@@ -1,5 +1,5 @@
 # Verzeichnisse
-.venv/              # Virtuelle Umgebung
+/.venv/            # Virtuelle Umgebung
 __pycache__/       # Python Bytecode-Dateien
 instance/          # Instanzspezifische Konfigurationsdateien
 
