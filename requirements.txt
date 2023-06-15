@@ -1,0 +1,4 @@
+pipenv  # Paketmanager
+Flask   # Framework
+Flask-SQLAlchemy # Datenbank
+Flask-Migrate
