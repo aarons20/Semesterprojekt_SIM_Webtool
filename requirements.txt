@@ -1,4 +1,4 @@
 pipenv  # Paketmanager
 Flask   # Framework
-Flask-SQLAlchemy # Datenbank
+flask_sqlalchemy
 Flask-Migrate

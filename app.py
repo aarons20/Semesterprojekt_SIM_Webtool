@@ -9,6 +9,7 @@ from flask_migrate import MigrateCommand
 
 app = Flask(__name__)
 """
+db = SQLAlchemy()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -51,7 +52,8 @@ def index():
             opc='be3c92d74ab3fd725aed576bc72895a4'
         )
     ]
-    return render_template('index.html', profiles=profiles)
+    active_imsi = '262980000420002'
+    return render_template('index.html', profiles=profiles, active_imsi = active_imsi)
 
 if __name__ == '__main__':
     app.run(debug=True)
