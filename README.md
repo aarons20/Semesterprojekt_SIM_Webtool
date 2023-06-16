@@ -17,20 +17,15 @@ source .venv/bin/activate
 
 3. Install the required dependencies:
 ```
-p install -r requirements.txt
+python3 install -r requirements.txt
 ```
 
-4. Configure the application settings:
-
-Update the configuration file `config.py` with your desired settings, such as database connection details and API keys.
-
-5. Run the application:
+4. Run the application:
 ```
-python app.py
+flask run
 ```
 
-
-The application will be accessible at `http://localhost:5000`.
+The application will be accessible at ```http://127.0.0.1:5000```.
 
 ## Usage
 

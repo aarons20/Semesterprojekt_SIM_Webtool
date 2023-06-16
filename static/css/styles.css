@@ -20,6 +20,33 @@ header {
   padding: 20px;
   display: flex;
 }
+.status-indicator {
+  display: flex;
+  align-items: center;
+}
+.spacer {
+  flex-grow: 1;
+}
+
+.circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.green {
+  background-color: green;
+}
+
+.red {
+  background-color: red;
+}
+
+.status-text {
+  font-size: 14px;
+}
+
 
 main {
   padding-top: 25px;
