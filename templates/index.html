@@ -27,13 +27,15 @@
         </div>
         <h1>SIM Flasher</h1>
         <div class="spacer"></div>
-        <div class="status-indicator">
-            <div class="circle {% if device_connected %}green{% else %}red{% endif %}"></div>
+        <div class="status-indicator" id="statusIndicator">
+            <div class="circle {% if status == SimReaderWriterStatus.NO_CONNECTION %}red{% elif status == SimReaderWriterStatus.READER_CONNECTED  %}yellow{% else %}green{% endif %}"></div>
             <div class="status-text">
-              {% if device_connected %}
-                Gerät verbunden
-              {% else %}
-                SIM-Schreibegerät verbinden
+              {% if status == SimReaderWriterStatus.NO_CONNECTION %}
+                No connection
+              {% elif status == SimReaderWriterStatus.READER_CONNECTED  %}
+                Reader connected
+              {% elif status == SimReaderWriterStatus.SIM_DETECTED %}
+                SIM detected
               {% endif %}
             </div>
           </div>

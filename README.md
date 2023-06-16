@@ -17,7 +17,7 @@ source .venv/bin/activate
 
 3. Install the required dependencies:
 ```
-python3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 4. Run the application:

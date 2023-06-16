@@ -2,3 +2,4 @@ pipenv  # Paketmanager
 Flask   # Framework
 flask_sqlalchemy
 Flask-Migrate
+git+https://github.com/osmocom/pysim.git#egg=pysim

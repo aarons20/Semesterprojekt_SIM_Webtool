@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from models.sim_profile import SIMProfile
+from sim_reader_writer import SIMReaderWriter, SimReaderWriterStatus
 """
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import MigrateCommand
@@ -8,6 +9,7 @@ from flask_migrate import MigrateCommand
 
 
 app = Flask(__name__)
+sim_reader_writer = SIMReaderWriter()
 """
 db = SQLAlchemy()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -31,6 +33,7 @@ class User(db.Model):
 """
 
 @app.route('/')
+@app.route('/get-updated-profiles')
 def index():
     profiles = [
         SIMProfile(        
@@ -52,8 +55,16 @@ def index():
             opc='be3c92d74ab3fd725aed576bc72895a4'
         )
     ]
-    active_imsi = '262980000420002'
-    return render_template('index.html', profiles=profiles, active_imsi = active_imsi)
+    active_imsi = ""
+    sim_profile = sim_reader_writer.get_sim_profile()
+    if sim_profile is not None:       
+        active_imsi = sim_profile.imsi
+    reader_status = sim_reader_writer.reader_status()
+    return render_template('index.html', 
+                           profiles=profiles,
+                           active_imsi = active_imsi, 
+                           status = reader_status,
+                           SimReaderWriterStatus=SimReaderWriterStatus)
 
 if __name__ == '__main__':
     app.run(debug=True)

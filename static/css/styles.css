@@ -42,6 +42,9 @@ header {
 .red {
   background-color: red;
 }
+.yellow {
+  background-color: #ffde00;
+}
 
 .status-text {
   font-size: 14px;

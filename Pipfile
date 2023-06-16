@@ -8,6 +8,7 @@ flask = "*"
 pipenv = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
+pysim = {git = "https://github.com/osmocom/pysim.git"}
 
 [dev-packages]
 
