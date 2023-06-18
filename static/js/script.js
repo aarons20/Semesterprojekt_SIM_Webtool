@@ -17,56 +17,117 @@ function copyToClipboard(value, button) {
     }, 1000); // Adjust the duration as needed
   }
   
-  function reloadView() {
-    var accordionItems = document.querySelectorAll("#myAccordion .accordion-item");
-    // Create an array to store the state of each accordion item
-    var accordionState = [];
+function reloadView() {
+  var accordionItems = document.querySelectorAll("#myAccordion .accordion-item");
+  // Create an array to store the state of each accordion item
+  var accordionState = [];
 
-    // Iterate over each accordion item
-    accordionItems.forEach(function(item) {
-      var isOpen = item.querySelector(".accordion-collapse").classList.contains("show");
-      accordionState.push(isOpen);
-    });
-    console.log(accordionState)
+  // Iterate over each accordion item
+  accordionItems.forEach(function(item) {
+    var isOpen = item.querySelector(".accordion-collapse").classList.contains("show");
+    accordionState.push(isOpen);
+  });
+  console.log(accordionState)
 
-    // Convert the accordion state to a JSON string to send in the AJAX request
-    var accordionStateJson = JSON.stringify(accordionState);
+  // Convert the accordion state to a JSON string to send in the AJAX request
+  var accordionStateJson = JSON.stringify(accordionState);
 
-    // AJAX request to retrieve updated profiles from the server
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/get-updated-profiles", true);   
-    xhr.onreadystatechange = function() {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          var parser = new DOMParser();
-          // Parse the response HTML
-          var parsedHTML = parser.parseFromString(xhr.responseText, "text/html");
+  // AJAX request to retrieve updated profiles from the server
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "/get-updated-profiles", true);   
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.status === 200) {
+        var parser = new DOMParser();
+        // Parse the response HTML
+        var parsedHTML = parser.parseFromString(xhr.responseText, "text/html");
 
-          // Update the content of the accordion with the new profile data
-          var accordionContainer = document.getElementById("myAccordion");
-          accordionContainer.innerHTML = parsedHTML.getElementById("myAccordion").innerHTML;
-          var status_indicator = document.getElementById("statusIndicator");
-          status_indicator.innerHTML = parsedHTML.getElementById("statusIndicator").innerHTML;
-            
-          // Restore the accordion state based on the response
-          var updatedAccordionItems = document.querySelectorAll("#myAccordion .accordion-item");
-          updatedAccordionItems.forEach(function(updatedItem, index) {
-            var isOpen = accordionState[index];
-            if (isOpen) {
-              updatedItem.querySelector(".accordion-collapse").classList.add("show");
-              updatedItem.querySelector(".accordion-button").classList.remove("collapsed");
-            } else {
-              updatedItem.querySelector(".accordion-collapse").classList.remove("show");
-              updatedItem.querySelector(".accordion-button").classList.add("collapsed");
-            }
-          });
-        } else {
-          console.error("Error retrieving profile data");
-        }
+        // Update the content of the accordion with the new profile data
+        var accordionContainer = document.getElementById("myAccordion");
+        accordionContainer.innerHTML = parsedHTML.getElementById("myAccordion").innerHTML;
+        var status_indicator = document.getElementById("statusIndicator");
+        status_indicator.innerHTML = parsedHTML.getElementById("statusIndicator").innerHTML;
+          
+        // Restore the accordion state based on the response
+        var updatedAccordionItems = document.querySelectorAll("#myAccordion .accordion-item");
+        updatedAccordionItems.forEach(function(updatedItem, index) {
+          var isOpen = accordionState[index];
+          if (isOpen) {
+            updatedItem.querySelector(".accordion-collapse").classList.add("show");
+            updatedItem.querySelector(".accordion-button").classList.remove("collapsed");
+          } else {
+            updatedItem.querySelector(".accordion-collapse").classList.remove("show");
+            updatedItem.querySelector(".accordion-button").classList.add("collapsed");
+          }
+        });
+      } else {
+        console.error("Error retrieving profile data");
       }
-    };
-    xhr.send();
-  }
+    }
+  };
+  xhr.send();
+}
 
-  // Starte die Aktualisierung alle 3 Sekunden
-  setInterval(reloadView, 3000);
+// Disable UI elements
+function disableUI() {
+  $(".update-profile-button").prop("disabled", true);
+  // Add additional code to disable other UI elements if needed
+}
+
+// Enable UI elements
+function enableUI() {
+  $(".update-profile-button").prop("disabled", false);
+  // Add additional code to enable other UI elements if needed
+}
+
+// Function to show the loading overlay
+function showLoadingOverlay() {
+  document.getElementById("loading-overlay").style.display = "flex";
+}
+
+// Function to hide the loading overlay
+function hideLoadingOverlay() {
+  document.getElementById("loading-overlay").style.display = "none";
+}
+
+$(document).ready(function() {
+  hideLoadingOverlay();
+  // Add click event listener to a parent element containing profile buttons
+  $("main").on("click", "button.update-profile-button", function() {
+    disableUI();
+    showLoadingOverlay();
+
+    // Get the imsi data attribute of the clicked button
+    var imsi = $(this).data("imsi");
+    
+    // Send the imsi to the backend using AJAX
+    $.ajax({
+      type: "POST",
+      url: "/trigger-method",
+      data: { 
+        imsi: imsi 
+      },
+      success: function(response) {
+        // Handle the response from the backend
+        reloadView();
+
+        enableUI();
+        setTimeout(function() {         
+          hideLoadingOverlay();
+        }, 2000);
+        console.log(response);
+      },
+      error: function(error) {
+        // Handle any errors that occur during the AJAX request
+        
+        enableUI();
+        hideLoadingOverlay();
+        console.error(error);
+      }
+    });
+  });
+});
+
+
+// Starte die Aktualisierung alle 3 Sekunden
+setInterval(reloadView, 2000);

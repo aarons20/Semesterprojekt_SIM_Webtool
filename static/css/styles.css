@@ -142,8 +142,6 @@ h1 {
   animation: share 0.5s;
 }
 
-
-
 .add-icon {
   background: none;
   border: none;
@@ -152,4 +150,66 @@ h1 {
 
 .accordion-content {
   padding: 10px;
+}
+
+
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#progress-text {
+  margin-top: 25px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  animation: sk-chase 2.5s infinite linear both;
+}
+
+.sk-chase-dot {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: sk-chase-dot 2.0s infinite ease-in-out both;
+}
+
+.sk-chase-dot:before {
+  content: "";
+  display: block;
+  width: 25%;
+  height: 25%;
+  background-color: #ffde00;
+  border-radius: 100%;
+  animation: sk-chase-dot-before 2.0s infinite ease-in-out both;
+}
+
+@keyframes sk-chase {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sk-chase-dot {
+  80%, 100% { transform: rotate(360deg); }
+}
+
+@keyframes sk-chase-dot-before {
+  50% {
+    transform: scale(0.4);
+  }
+  100%, 0% {
+    transform: scale(1.0);
+  }
 }
