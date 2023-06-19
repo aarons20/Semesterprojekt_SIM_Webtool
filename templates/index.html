@@ -1,133 +1,132 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Meine Website</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="/static/js/script.js"></script>
+{% extends "baseTemplate.html" %}
+
+{% block title %}
+  SIM Flasker
+{% endblock %}
+
+{% block extra_css %}
   <style>
-        .modal-header {
-            background: #ffde00;
-            color: #000;
-        }
-        
-        .required:after {
-            content: "*";
-            color: #155b91;
-        }
+    .modal-header {
+        background: #ffde00;
+        color: #000;
+    }
+    
+    .required:after {
+        content: "*";
+        color: #155b91;
+    }
+    input:required:invalid {
+      border-color: red;
+    }
+
+    input:required:invalid + .invalid-feedback {
+      display: block;
+      color: red;
+    }
+
+    .btn-primary {
+      background-color: #1678c3;
+      border-color: #1678c3;
+      color: white;
+    }
+    .btn-secondary {
+      background-color: white;
+      border-color: #1678c3;
+      color: #1678c3;
+    }
   </style>
-</head>
-<body>  
-  <div class="container">
-    <div class="main-container">
-      <header>
-        <div class="logo">
-          <img src="/static/images/VEGA-logo.svg" alt="VEGA Logo">
-        </div>
-        <h1>SIM Flasher</h1>
-        <div class="spacer"></div>
-        <div class="status-indicator" id="statusIndicator">
-            <div class="circle {% if status == SimReaderWriterStatus.NO_CONNECTION %}red{% elif status == SimReaderWriterStatus.READER_CONNECTED  %}yellow{% else %}green{% endif %}"></div>
-            <div class="status-text">
-              {% if status == SimReaderWriterStatus.NO_CONNECTION %}
-                No connection
-              {% elif status == SimReaderWriterStatus.READER_CONNECTED  %}
-                Reader connected
-              {% elif status == SimReaderWriterStatus.SIM_DETECTED %}
-                SIM detected
-              {% endif %}
+{% endblock %}
+
+{% block headerTitle %}
+  SIM Flasker
+{% endblock %}
+
+{% block statusIndicator %}
+  <div class="status-indicator" id="statusIndicator">
+    <div class="circle {% if status == SimReaderWriterStatus.NO_CONNECTION %}red{% elif status == SimReaderWriterStatus.READER_CONNECTED  %}yellow{% else %}green{% endif %}"></div>
+    <div class="status-text">
+      {% if status == SimReaderWriterStatus.NO_CONNECTION %}
+        No connection
+      {% elif status == SimReaderWriterStatus.READER_CONNECTED  %}
+        Reader connected
+      {% elif status == SimReaderWriterStatus.SIM_DETECTED %}
+        SIM detected
+      {% endif %}
+    </div>
+  </div>
+{% endblock %} 
+
+{% block content %}
+  <div class="button-container mt-3">
+    <button type="button" class="btn btn-primary vega-blue float-end" data-bs-toggle="modal" data-bs-target="#myModal">
+        <i class="bi bi-plus-circle-fill"></i> Add profile
+    </button>
+  </div>
+  <div class="accordion" id="myAccordion">
+    {% for profile in profiles %}
+      {% set mark_as_active = profile.imsi==active_imsi %}
+      <div class="accordion-item">
+        <h2 class="accordion-header {% if mark_as_active %}highlight{% endif %}" id="heading{{ loop.index }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"  aria-controls="collapse{{ loop.index }}">
+              IMSI: {{ profile.imsi }} 
+              <button class="update-profile-button" type="button" data-imsi="{{ profile.imsi }}">
+                  {% if mark_as_active %}
+                      <i class="bi bi-check2"></i>
+                  {% else %}
+                      <i class="bi bi-arrow-down-up"></i>
+                  {% endif %}                        
+              </button>
+            </button>
+        </h2>
+        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <div class="profile-info">
+              <strong>Name:</strong> {{ profile.name }} <button class="copy-button" onclick="copyToClipboard('{{ profile.name }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Name"><i class="bi bi-clipboard"></i></button><br>
+              <strong>IMSI:</strong> {{ profile.imsi }} <button class="copy-button" onclick="copyToClipboard('{{ profile.imsi }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy IMSI"><i class="bi bi-clipboard"></i></button><br>
+              <strong>KI:</strong> {{ profile.ki }} <button class="copy-button" onclick="copyToClipboard('{{ profile.ki }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy KI"><i class="bi bi-clipboard"></i></button><br>
+              <strong>OPC:</strong> {{ profile.opc }} <button class="copy-button" onclick="copyToClipboard('{{ profile.opc }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy OPC"><i class="bi bi-clipboard"></i></button><br>
             </div>
           </div>
-      </header>
+        </div>  
+      </div>    
+    {% endfor %}
+  </div> 
+{% endblock %}
 
-      <div class="placeholder-div">&nbsp;</div>
-
-      <main>
-        <div class="button-container mt-3">
-            <button type="button" class="btn btn-primary vega-blue float-end" data-bs-toggle="modal" data-bs-target="#myModal">
-                <i class="bi bi-plus-circle-fill"></i> Add profile
-            </button>
-        </div>
-        <div class="accordion" id="myAccordion">
-          {% for profile in profiles %}
-          {% set mark_as_active = profile.imsi==active_imsi %}
-          <div class="accordion-item">
-              <h2 class="accordion-header {% if mark_as_active %}highlight{% endif %}" id="heading{{ loop.index }}">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"  aria-controls="collapse{{ loop.index }}">
-                    IMSI: {{ profile.imsi }} 
-                    <button class="update-profile-button" type="button" data-imsi="{{ profile.imsi }}">
-                        {% if mark_as_active %}
-                            <i class="bi bi-check2"></i>
-                        {% else %}
-                            <i class="bi bi-arrow-down-up"></i>
-                        {% endif %}                        
-                    </button>
-                  </button>
-              </h2>
-              <div id="collapse{{ loop.index }}" class="accordion-collapse collapse">
-                  <div class="accordion-body">
-                    <div class="profile-info">
-                        <strong>Name:</strong> {{ profile.name }} <button class="copy-button" onclick="copyToClipboard('{{ profile.name }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy Name"><i class="bi bi-clipboard"></i></button><br>
-                        <strong>IMSI:</strong> {{ profile.imsi }} <button class="copy-button" onclick="copyToClipboard('{{ profile.imsi }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy IMSI"><i class="bi bi-clipboard"></i></button><br>
-                        <strong>KI:</strong> {{ profile.ki }} <button class="copy-button" onclick="copyToClipboard('{{ profile.ki }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy KI"><i class="bi bi-clipboard"></i></button><br>
-                        <strong>OPC:</strong> {{ profile.opc }} <button class="copy-button" onclick="copyToClipboard('{{ profile.opc }}', this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy OPC"><i class="bi bi-clipboard"></i></button><br>
-                    </div>
-              </div>
-          </div>
-          {% endfor %}
-        </div>    
-  </div>  
-</main>
-    
+{% block modals %}
   <div class="modal" id="myModal">
-        <div class="modal-dialog">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title">Contact Us</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Contact Us</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <form id="simProfileForm" action="submitForm">
+                  <div class="mb-3">
+                    <label class="form-label required">Netzbetreiber</label>
+                    <input type="text" class="form-control" name="name">
                   </div>
-                  <div class="modal-body">
-                      <form>
-                          <div class="mb-3">
-                              <label class="form-label required">Netzbetreiber</label>
-                              <input type="text" class="form-control">
-                          </div>
-                          <div class="mb-3">
-                              <label class="form-label required">IMSI</label>
-                              <input type="text" class="form-control">
-                          </div>
-                          <div class="mb-3">
-                              <label class="form-label required">Key</label>
-                              <input type="text" class="form-control">
-                          </div>
-                          <div class="mb-3">
-                              <label class="form-label required">OPC</label>
-                              <input type="text" class="form-control">
-                          </div>
-                      </form>
+                  <div class="mb-3">
+                      <label class="form-label required">IMSI</label>
+                      <input type="text" class="form-control" name="imsi">
                   </div>
-                  <div class="modal-footer">
-                      <button type="submit" class="btn btn-primary">Submit</button>
-                      <button type="submit" class="btn btn-danger">Cancel</button>
+                  <div class="mb-3">
+                      <label class="form-label required">Key</label>
+                      <input type="text" class="form-control" name="ki">
                   </div>
+                  <div class="mb-3">
+                      <label class="form-label required">OPC</label>
+                      <input type="text" class="form-control" name="opc">
+                  </div>                
+                </form>                             
+              </div>
+              <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
+                  <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
               </div>
           </div>
       </div>
-  </div>
-  <div id="loading-overlay">
-    <div class="loading-spinner sk-chase">
-      <div class="sk-chase-dot"></div>
-      <div class="sk-chase-dot"></div>
-      <div class="sk-chase-dot"></div>
-      <div class="sk-chase-dot"></div>
-      <div class="sk-chase-dot"></div>
-      <div class="sk-chase-dot"></div>
     </div>
-    <div id="progress-text">Loading...</div>
   </div>
-  </div>
-</body>
-</html>
+{% endblock %}

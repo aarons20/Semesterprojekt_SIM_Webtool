@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
 from database_connectivity import DataBaseConnectivity
 from models.sim_profile import SIMProfile
 from sim_reader_writer import SIMReaderWriter, SimReaderWriterStatus
@@ -11,7 +11,12 @@ db = DataBaseConnectivity()
 @app.route('/')
 @app.route('/get-updated-profiles')
 def index():
-    profiles = db.getSIMProfiles()
+    profiles = None
+    try:
+        profiles = db.getSIMProfiles()
+    except Exception as e:
+        print(str(e))
+        profiles = []
     active_imsi = None
     sim_profile = sim_reader_writer.get_sim_profile()
     """
@@ -61,6 +66,26 @@ def trigger_method():
         print('SIMProfile not found')
 
     return 'Method triggered successfully'
+
+@app.route('/create-sim-profile', methods=['POST'])
+def create_sim_profile():
+    name = request.form.get('name')
+    imsi = request.form.get('imsi')
+    ki = request.form.get('ki')
+    opc = request.form.get('opc')
+    print(f"imsi {imsi}, name {name} ki {ki} opc {opc}")
+
+    sim_profile = SIMProfile(        
+                imsi=imsi,
+                name=name,
+                ki=ki,
+                opc=opc
+            )
+    try:
+        db.addSIMProfile(sim_profile=sim_profile)
+        return 'Success'
+    except Exception as e:
+        abort(400, str(e))
 
 if __name__ == '__main__':
     app.run(debug=True)

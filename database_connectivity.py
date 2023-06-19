@@ -44,8 +44,13 @@ class DataBaseConnectivity:
             self.addSIMProfile(profile)
 
     def addSIMProfile(self, sim_profile: SIMProfile):
-        self._session.add(sim_profile)
-        self._session.commit()
+        try:
+            self._session.add(sim_profile)
+            self._session.commit()
+        except Exception as e:
+            self._session.rollback()
+            raise Exception(str(e))
+                
 
     def getSIMProfiles(self):
         return self._session.query(SIMProfile).all()

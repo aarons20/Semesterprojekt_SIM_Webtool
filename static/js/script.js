@@ -60,6 +60,15 @@ function reloadView() {
             updatedItem.querySelector(".accordion-button").classList.add("collapsed");
           }
         });
+
+        // disable buttons if no SIM detected
+        var isSIMConnected = document.getElementById("statusIndicator")
+                  .querySelector(".circle").classList.contains("green") ? true : false;
+        if (isSIMConnected) {
+          enableUI()
+        } else {
+          disableUI()
+        }
       } else {
         console.error("Error retrieving profile data");
       }
@@ -89,6 +98,38 @@ function showLoadingOverlay() {
 function hideLoadingOverlay() {
   document.getElementById("loading-overlay").style.display = "none";
 }
+
+// Function to show the loading overlay
+function showErrorOverlay() {
+  document.getElementById("error-overlay").style.display = "flex";
+}
+
+// Function to hide the loading overlay
+function hideErrorOverlay() {
+  document.getElementById("error-overlay").style.display = "none";
+}
+
+function submitForm() {
+  showLoadingOverlay();
+  // Get the form data
+  var formData = $('#simProfileForm').serialize();  
+  // Send an AJAX request to the backend
+  $.ajax({
+    url: '/create-sim-profile',
+    method: 'POST',
+    data: formData,
+    success: function(response) {  
+      document.getElementById('simProfileForm').reset() 
+      console.log(response)
+      hideLoadingOverlay()
+    },
+    error: function(xhr, status, error) {        
+      console.error(error);
+      hideLoadingOverlay()     
+    }
+  });
+}
+
 
 $(document).ready(function() {
   hideLoadingOverlay();
