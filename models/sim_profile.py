@@ -1,12 +1,14 @@
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String
+from sqlalchemy.ext.declarative import declarative_base
 
-db = SQLAlchemy()
+Base = declarative_base()
+class SIMProfile(Base):
+    __tablename__ = 'sim_profiles'
 
-class SIMProfile(db.Model):
-    imsi = db.Column(db.String(255), primary_key=True)
-    name = db.Column(db.String(255), nullable=False)    
-    ki = db.Column(db.String(255), nullable=False)
-    opc = db.Column(db.String(255), nullable=False)
+    imsi = Column(String(255), primary_key=True)
+    name = Column(String(255), nullable=False)    
+    ki = Column(String(255), nullable=False)
+    opc = Column(String(255), nullable=False)
 
     def __init__(self, imsi, name, ki, opc):
         self.name = name        

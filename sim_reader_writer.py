@@ -92,12 +92,11 @@ class SIMReaderWriter():
                     "-k", sim_profile.ki, # ki
                     "-o", sim_profile.opc # opc
                     ]
-            print("test")
             from pySim.card_handler import CardHandler, CardHandlerAuto
             from pySim_prog_fuctions import process_card, parse_options
             
             self.opts_writer = parse_options(args)
-            print(self.opts_writer)
+            #print(self.opts_writer)
             try:
                 if self.opts_writer.card_handler_config:
                     ch = CardHandlerAuto(self.sl, self.opts_writer.card_handler_config)

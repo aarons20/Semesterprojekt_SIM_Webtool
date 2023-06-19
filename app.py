@@ -1,42 +1,17 @@
 from flask import Flask, render_template, request
-from database_connectivity import getSIMProfiles
+from database_connectivity import DataBaseConnectivity
 from models.sim_profile import SIMProfile
 from sim_reader_writer import SIMReaderWriter, SimReaderWriterStatus
-"""
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import MigrateCommand
-"""
-
 
 
 app = Flask(__name__)
 sim_reader_writer = SIMReaderWriter()
-"""
-db = SQLAlchemy()
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-
-class User(db.Model):
-    __tablename__ = 'users'
-
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
-
-    def __repr__(self):
-        return f'<User {self.username}>'
-"""
+db = DataBaseConnectivity()
 
 @app.route('/')
 @app.route('/get-updated-profiles')
 def index():
-    profiles = getSIMProfiles()
+    profiles = db.getSIMProfiles()
     active_imsi = None
     sim_profile = sim_reader_writer.get_sim_profile()
     """

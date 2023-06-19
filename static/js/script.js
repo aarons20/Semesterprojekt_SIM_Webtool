@@ -130,4 +130,4 @@ $(document).ready(function() {
 
 
 // Starte die Aktualisierung alle 3 Sekunden
-setInterval(reloadView, 2000);
+setInterval(reloadView, 3000);
