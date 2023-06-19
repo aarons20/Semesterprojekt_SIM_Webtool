@@ -36,12 +36,12 @@ def index():
                            status = reader_status,
                            SimReaderWriterStatus=SimReaderWriterStatus)
 
-@app.route('/trigger-method', methods=['POST'])
+@app.route('/write-sim-profile', methods=['POST'])
 def trigger_method():
     print(" ======= Running request...")
     imsi = request.form.get('imsi')
     print("Received imsi:", imsi)
-    sim_profiles = getSIMProfiles()
+    sim_profiles = db.getSIMProfiles()
 
     # Find the SIMProfile object with the matching 'imsi'
     target_profile = None

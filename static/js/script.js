@@ -103,7 +103,7 @@ $(document).ready(function() {
     // Send the imsi to the backend using AJAX
     $.ajax({
       type: "POST",
-      url: "/trigger-method",
+      url: "/write-sim-profile",
       data: { 
         imsi: imsi 
       },
