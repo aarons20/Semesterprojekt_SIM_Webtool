@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, abort
+from flask import Flask, jsonify, render_template, request, abort
 from database_connectivity import DataBaseConnectivity
 from models.sim_profile import SIMProfile
 from sim_reader_writer import SIMReaderWriter, SimReaderWriterStatus
@@ -59,13 +59,13 @@ def trigger_method():
     if target_profile:
         try:
             sim_reader_writer.write_sim(sim_profile=target_profile)
-        except:
-            return "Error occured"
+        except Exception as e:
+            abort(400, "Error: " + str(e))
     else:
         # The target_profile is not found
-        print('SIMProfile not found')
+        abort(400, "Error: SIMProfile not found")
 
-    return 'Method triggered successfully'
+    return 'SIM updated successfully'
 
 @app.route('/create-sim-profile', methods=['POST'])
 def create_sim_profile():
@@ -86,6 +86,12 @@ def create_sim_profile():
         return 'Success'
     except Exception as e:
         abort(400, str(e))
+
+@app.errorhandler(400)
+def handle_bad_request(error):
+    response = jsonify(message=error.description)
+    response.status_code = error.code
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

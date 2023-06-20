@@ -19,18 +19,6 @@ function copyToClipboard(value, button) {
   
 function reloadView() {
   var accordionItems = document.querySelectorAll("#myAccordion .accordion-item");
-  // Create an array to store the state of each accordion item
-  var accordionState = [];
-
-  // Iterate over each accordion item
-  accordionItems.forEach(function(item) {
-    var isOpen = item.querySelector(".accordion-collapse").classList.contains("show");
-    accordionState.push(isOpen);
-  });
-  console.log(accordionState)
-
-  // Convert the accordion state to a JSON string to send in the AJAX request
-  var accordionStateJson = JSON.stringify(accordionState);
 
   // AJAX request to retrieve updated profiles from the server
   var xhr = new XMLHttpRequest();
@@ -38,8 +26,16 @@ function reloadView() {
   xhr.onreadystatechange = function() {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       if (xhr.status === 200) {
-        var parser = new DOMParser();
+        // Create an array to store the state of each accordion item
+        var accordionState = [];
+        // Iterate over each accordion item
+        accordionItems.forEach(function(item) {
+          var isOpen = item.querySelector(".accordion-collapse").classList.contains("show");
+          accordionState.push(isOpen);
+        });
+        
         // Parse the response HTML
+        var parser = new DOMParser();        
         var parsedHTML = parser.parseFromString(xhr.responseText, "text/html");
 
         // Update the content of the accordion with the new profile data
@@ -158,17 +154,20 @@ $(document).ready(function() {
         }, 2000);
         console.log(response);
       },
-      error: function(error) {
+      error: function(xhr, status, error) {
         // Handle any errors that occur during the AJAX request
-        
         enableUI();
         hideLoadingOverlay();
-        console.error(error);
+        console.log("Error: " + xhr.responseJSON.message);
       }
     });
   });
 });
 
+// Prevent browser error logging
+window.onerror = function(message, source, lineno, colno, error) {
+  return true;
+};
 
 // Starte die Aktualisierung alle 3 Sekunden
 setInterval(reloadView, 3000);

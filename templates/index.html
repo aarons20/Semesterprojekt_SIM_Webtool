@@ -1,7 +1,7 @@
 {% extends "baseTemplate.html" %}
 
 {% block title %}
-  SIM Flasker
+  SIM Flasher
 {% endblock %}
 
 {% block extra_css %}
@@ -38,7 +38,7 @@
 {% endblock %}
 
 {% block headerTitle %}
-  SIM Flasker
+  SIM Flasher
 {% endblock %}
 
 {% block statusIndicator %}
@@ -98,13 +98,13 @@
     <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title">Contact Us</h5>
+                  <h5 class="modal-title">Add a sim profile</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <div class="modal-body">
                 <form id="simProfileForm" action="submitForm">
                   <div class="mb-3">
-                    <label class="form-label required">Netzbetreiber</label>
+                    <label class="form-label required">Network name</label>
                     <input type="text" class="form-control" name="name">
                   </div>
                   <div class="mb-3">
