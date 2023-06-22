@@ -1,3 +1,4 @@
+import time
 from flask import Flask, jsonify, render_template, request, abort
 from database_connectivity import DataBaseConnectivity
 from models.sim_profile import SIMProfile
@@ -55,12 +56,20 @@ def trigger_method():
             target_profile = profile
             break
 
-    # Check if the target_profile was found
-    if target_profile:
-        try:
-            sim_reader_writer.write_sim(sim_profile=target_profile)
-        except Exception as e:
-            abort(400, "Error: " + str(e))
+    # Try to write sim profile if profile found
+    trys_for_writing = 3
+    if target_profile:        
+        while(trys_for_writing > 0):       
+            try:   
+                sim_reader_writer.write_sim(sim_profile=target_profile)
+                break
+            except Exception as e:
+                print("--- In except writing")          
+                if(trys_for_writing > 0):
+                    time.sleep(1)
+                    trys_for_writing -= 1                    
+                else:
+                    abort(400, "Error: " + str(e))
     else:
         # The target_profile is not found
         abort(400, "Error: SIMProfile not found")
