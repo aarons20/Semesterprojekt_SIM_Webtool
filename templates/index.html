@@ -104,7 +104,7 @@
           <div class="modal-content">
               <div class="modal-header">
                   <h5 class="modal-title">Add a sim profile</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" class="btn-close" onclick="resetProfileForm()"></button>
               </div>
               <div class="modal-body">
                 <form id="simProfileForm" action="submitForm">
@@ -135,7 +135,7 @@
                   <small id="submitError" class="text-danger"></small>
                 </div>
                 <button type="submit" class="btn btn-primary" onclick="submitProfileForm()">Submit</button>
-                <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetProfileForm()">Cancel</button>
+                <button type="cancel" class="btn btn-secondary" onclick="resetProfileForm()">Cancel</button>
               </div>
           </div>
       </div>

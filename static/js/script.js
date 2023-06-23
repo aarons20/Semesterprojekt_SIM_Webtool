@@ -183,19 +183,21 @@ function submitProfileForm() {
       method: 'POST',
       data: formData,
       success: function(response) {
-        form.reset();
+        setTimeout(function() {         
+          resetProfileForm();
+        }, 1000);
         console.log(response);
-        hideLoadingOverlay();
       },
       error: function(xhr, status, error) {
         console.error(error);
+        submitErrorElement.textContent = 'Please check your input values';
         hideLoadingOverlay();
       }
     });
   } else {
     hideLoadingOverlay();
     // Display an error message
-    submitErrorElement.textContent = 'Please check your input values';   
+    submitErrorElement.textContent = 'Please check your input values';
     validateProfileForm(); 
     console.log('Profile form contains invalid values');
   }
@@ -210,6 +212,10 @@ function resetProfileForm() {
   document.getElementById('kiError').textContent = '';
   document.getElementById('opcError').textContent = '';
   document.getElementById('submitError').textContent = '';
+
+  var myModal = document.getElementById('myModal');
+  var modal = bootstrap.Modal.getInstance(myModal);
+  modal.hide();
 
   hideLoadingOverlay();
 }
