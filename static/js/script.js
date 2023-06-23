@@ -105,25 +105,113 @@ function hideErrorOverlay() {
   document.getElementById("error-overlay").style.display = "none";
 }
 
-function submitForm() {
-  showLoadingOverlay();
-  // Get the form data
-  var formData = $('#simProfileForm').serialize();  
-  // Send an AJAX request to the backend
-  $.ajax({
-    url: '/create-sim-profile',
-    method: 'POST',
-    data: formData,
-    success: function(response) {  
-      document.getElementById('simProfileForm').reset() 
-      console.log(response)
-      hideLoadingOverlay()
-    },
-    error: function(xhr, status, error) {        
-      console.error(error);
-      hideLoadingOverlay()     
+function validateProfileForm() {
+  var isValid = true;
+
+  // Perform validation checks for each field
+  var nameInput = document.getElementById('nameInput');
+  var imsiInput = document.getElementById('imsiInput');
+  var kiInput = document.getElementById('kiInput');
+  var opcInput = document.getElementById('opcInput');
+
+  var submitErrorVisible = (document.getElementById('submitError').textContent.trim() !== '');
+
+  // Validation checks for 'name' field
+  var nameErrorElement = document.getElementById('nameError');
+  if (nameInput.value.trim() === '' && submitErrorVisible) {
+    nameErrorElement.textContent = 'Name cannot be empty';
+    isValid = false;
+  } else {
+    nameErrorElement.textContent = '';
+    if(nameInput.value.trim() === '') {
+      isValid = false;
     }
-  });
+  }
+
+  // Validation checks for 'imsi' field
+  var imsiErrorElement = document.getElementById('imsiError');
+  if (!/^\d{15}$/.test(imsiInput.value) && (imsiInput.value.trim() !== '' || submitErrorVisible)) {
+    imsiErrorElement.textContent = 'IMSI must be exactly 15 digits';
+    isValid = false;
+  } else {
+    imsiErrorElement.textContent = '';
+    if(imsiInput.value.trim() === '') {
+      isValid = false;
+    }
+  }
+
+  // Validation checks for 'ki' field
+  var kiErrorElement = document.getElementById('kiError');
+  if (!/^[0-9a-fA-F]{32}$/.test(kiInput.value) && (kiInput.value.trim() !== '' || submitErrorVisible)) {
+    kiErrorElement.textContent = 'KI must be 128 bits in hexadecimal format';
+    isValid = false;
+  } else {
+    kiErrorElement.textContent = '';
+    if(kiInput.value.trim() === '') {
+      isValid = false;
+    }
+  }
+
+  // Validation checks for 'opc' field
+  var opcErrorElement = document.getElementById('opcError');
+  if (!/^[0-9a-fA-F]{32}$/.test(opcInput.value) && (opcInput.value.trim() !== '' || submitErrorVisible)) {
+    opcErrorElement.textContent = 'OPC must be 128 bits in hexadecimal format';
+    isValid = false;
+  } else {
+    opcErrorElement.textContent = '';
+    if(opcInput.value.trim() === '') {
+      isValid = false;
+    }    
+  }
+
+  return isValid;
+}
+
+function submitProfileForm() {
+  showLoadingOverlay();
+
+  var form = document.getElementById('simProfileForm');
+  var isValid = validateProfileForm();
+  var submitErrorElement = document.getElementById('submitError');
+
+  if (isValid) {
+    var formData = $(form).serialize();
+    submitErrorElement.textContent = '';
+
+    $.ajax({
+      url: '/create-sim-profile',
+      method: 'POST',
+      data: formData,
+      success: function(response) {
+        form.reset();
+        console.log(response);
+        hideLoadingOverlay();
+      },
+      error: function(xhr, status, error) {
+        console.error(error);
+        hideLoadingOverlay();
+      }
+    });
+  } else {
+    hideLoadingOverlay();
+    // Display an error message
+    submitErrorElement.textContent = 'Please check your input values';   
+    validateProfileForm(); 
+    console.log('Profile form contains invalid values');
+  }
+}
+
+function resetProfileForm() {
+  showLoadingOverlay();
+
+  document.getElementById('simProfileForm').reset();
+  document.getElementById('nameError').textContent = '';
+  document.getElementById('imsiError').textContent = '';
+  document.getElementById('kiError').textContent = '';
+  document.getElementById('opcError').textContent = '';
+  document.getElementById('submitError').textContent = '';
+
+  hideLoadingOverlay();
 }
 
 
@@ -164,10 +252,6 @@ $(document).ready(function() {
   });
 });
 
-// Prevent browser error logging
-window.onerror = function(message, source, lineno, colno, error) {
-  return true;
-};
 
 // Starte die Aktualisierung alle 3 Sekunden
 setInterval(reloadView, 3000);

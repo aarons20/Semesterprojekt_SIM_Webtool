@@ -24,6 +24,11 @@
       color: red;
     }
 
+    .submit-error-container {
+      flex-grow: 1;
+      text-align: left;
+      padding-right: 10px;
+    }
     .btn-primary {
       background-color: #1678c3;
       border-color: #1678c3;
@@ -105,25 +110,32 @@
                 <form id="simProfileForm" action="submitForm">
                   <div class="mb-3">
                     <label class="form-label required">Network name</label>
-                    <input type="text" class="form-control" name="name">
+                    <input id="nameInput" type="text" class="form-control" name="name" oninput="return validateProfileForm()">
+                    <small id="nameError" class="text-danger"> </small>
                   </div>
                   <div class="mb-3">
                       <label class="form-label required">IMSI</label>
-                      <input type="text" class="form-control" name="imsi">
-                  </div>
+                      <input id="imsiInput" type="text" class="form-control" name="imsi" oninput="return validateProfileForm()">
+                      <small id="imsiError" class="text-danger"> </small>
+                    </div>
                   <div class="mb-3">
-                      <label class="form-label required">Key</label>
-                      <input type="text" class="form-control" name="ki">
+                      <label class="form-label required">KI</label>
+                      <input id="kiInput" type="text" class="form-control" name="ki" oninput="return validateProfileForm()">
+                      <small id="kiError" class="text-danger"> </small>
                   </div>
                   <div class="mb-3">
                       <label class="form-label required">OPC</label>
-                      <input type="text" class="form-control" name="opc">
+                      <input id="opcInput" type="text" class="form-control" name="opc" oninput="return validateProfileForm()">
+                      <small id="opcError" class="text-danger"> </small>
                   </div>                
                 </form>                             
               </div>
               <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary" onclick="submitForm()">Submit</button>
-                  <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <div class="submit-error-container">
+                  <small id="submitError" class="text-danger"></small>
+                </div>
+                <button type="submit" class="btn btn-primary" onclick="submitProfileForm()">Submit</button>
+                <button type="cancel" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetProfileForm()">Cancel</button>
               </div>
           </div>
       </div>

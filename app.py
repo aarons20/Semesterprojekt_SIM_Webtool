@@ -56,15 +56,14 @@ def trigger_method():
             target_profile = profile
             break
 
-    # Try to write sim profile if profile found
-    trys_for_writing = 3
-    if target_profile:        
-        while(trys_for_writing > 0):       
+    # Try to write sim profile if profile found    
+    if target_profile:
+        trys_for_writing = 2     
+        while(trys_for_writing >= 0):       
             try:   
                 sim_reader_writer.write_sim(sim_profile=target_profile)
                 break
-            except Exception as e:
-                print("--- In except writing")          
+            except Exception as e:        
                 if(trys_for_writing > 0):
                     time.sleep(1)
                     trys_for_writing -= 1                    
