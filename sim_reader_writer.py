@@ -5,6 +5,7 @@ from pySim.cards import card_detect, SimCard, UsimCard, IsimCard
 from pySim.commands import SimCardCommands
 
 from models.sim_profile import SIMProfile
+from models.sim_card import SIMCard
 
 class SimReaderWriterStatus(Enum):
     NO_CONNECTION = 1
@@ -78,14 +79,22 @@ class SIMReaderWriter():
                 opc = ''
                 return SIMProfile(imsi, name, ki, opc)
         except Exception as e: 
+            return None        
+        
+    def get_sim_card_iccid(self):
+        try:
+            if self.card is not None:
+                return self.card.read_iccid()[0]
             return None
+        except: 
+            return None      
     
-    def write_sim(self, sim_profile: SIMProfile):
+    def write_sim(self, sim_profile: SIMProfile, sim_card: SIMCard):
         if(self._reader_connected() and self._sim_detected()):
             args = ["-p", "0", # sim reader
                     "-n", sim_profile.name, # name of network
-                    "-a", "29700564", # adm-key 
-                    "-s", "8988211000000530000", # ICCID of sim
+                    "-a", sim_card.adm_key, # adm-key 
+                    "-s", sim_card.iccid, # ICCID of sim
                     "-i", sim_profile.imsi, # imsi
                     "-x", "262", # mcc
                     "-y", "98", # mnc

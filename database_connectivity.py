@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from models.sim_profile import Base, SIMProfile
+from models.sim_card import SIMCard
 
 class DataBaseConnectivity:    
     # Initializing
@@ -13,10 +14,15 @@ class DataBaseConnectivity:
 
         Base.metadata.create_all(self._engine)
         SIMProfile.__table__.create(bind=self._engine, checkfirst=True)
+        SIMCard.__table__.create(bind=self._engine, checkfirst=True)
 
         result = self._session.query(SIMProfile).first()
         if result is None:
             self._create_default_profiles()
+
+        result = self._session.query(SIMCard).first()
+        if result is None:
+            self._create_default_sim_cards()
 
     def _create_default_profiles(self):
         default_profiles = [
@@ -51,9 +57,30 @@ class DataBaseConnectivity:
             self._session.rollback()
             raise Exception(str(e))
                 
-
     def getSIMProfiles(self):
         return self._session.query(SIMProfile).all()
+    
+    def _create_default_sim_cards(self):
+        default_sim_cards = [
+            SIMCard(                
+                iccid='8988211000000539778',
+                adm_key='29700564'
+            )
+        ]
+
+        for card in default_sim_cards:
+            self.addSIMCard(card)
+
+    def addSIMCard(self, sim_card: SIMCard):
+        try:
+            self._session.add(sim_card)
+            self._session.commit()
+        except Exception as e:
+            self._session.rollback()
+            raise Exception(str(e))
+    
+    def getSIMCards(self):
+        return self._session.query(SIMCard).all()
     
     # Deleting (Calling destructor)
     def __del__(self):

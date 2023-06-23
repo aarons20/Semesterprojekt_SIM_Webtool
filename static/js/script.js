@@ -252,7 +252,7 @@ $(document).ready(function() {
         // Handle any errors that occur during the AJAX request
         enableUI();
         hideLoadingOverlay();
-        console.log("Error: " + xhr.responseJSON.message);
+        console.log(xhr.responseJSON.message);
       }
     });
   });

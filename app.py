@@ -2,6 +2,7 @@ import time
 from flask import Flask, jsonify, render_template, request, abort
 from database_connectivity import DataBaseConnectivity
 from models.sim_profile import SIMProfile
+from models.sim_card import SIMCard
 from sim_reader_writer import SIMReaderWriter, SimReaderWriterStatus
 
 
@@ -11,7 +12,9 @@ db = DataBaseConnectivity()
 
 @app.route('/')
 @app.route('/get-updated-profiles')
-def index():
+def index(): 
+    
+    # Check what sim profile is on sim card
     profiles = None
     try:
         profiles = db.getSIMProfiles()
@@ -35,10 +38,23 @@ def index():
     """
     if sim_profile is not None:       
         active_imsi = sim_profile.imsi
+    
+    # Check what sim card is connected
+    sim_cards = None
+    try:
+        sim_cards = db.getSIMCards()
+    except Exception as e:
+        print(str(e))
+        sim_cards = []       
+    sim_card_iccid = sim_reader_writer.get_sim_card_iccid()  
+    
+    # Render template
     reader_status = sim_reader_writer.reader_status()
     return render_template('index.html', 
                            profiles=profiles,
-                           active_imsi = active_imsi, 
+                           sim_cards = sim_cards,                           
+                           active_imsi = active_imsi,
+                           active_sim_card = sim_card_iccid,
                            status = reader_status,
                            SimReaderWriterStatus=SimReaderWriterStatus)
 
@@ -48,6 +64,7 @@ def trigger_method():
     imsi = request.form.get('imsi')
     print("Received imsi:", imsi)
     sim_profiles = db.getSIMProfiles()
+    sim_cards = db.getSIMCards()
 
     # Find the SIMProfile object with the matching 'imsi'
     target_profile = None
@@ -56,12 +73,19 @@ def trigger_method():
             target_profile = profile
             break
 
-    # Try to write sim profile if profile found    
+    # Try to write sim profile if profile found 
     if target_profile:
+        connected_sim_iccid = sim_reader_writer.get_sim_card_iccid()
+        target_sim_card= None
+        for sim_card in sim_cards:
+            if sim_card.iccid == connected_sim_iccid:
+                target_sim_card = sim_card
+                break
+
         trys_for_writing = 2     
         while(trys_for_writing >= 0):       
             try:   
-                sim_reader_writer.write_sim(sim_profile=target_profile)
+                sim_reader_writer.write_sim(sim_profile=target_profile, sim_card=target_sim_card)
                 break
             except Exception as e:        
                 if(trys_for_writing > 0):
