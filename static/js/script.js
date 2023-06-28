@@ -17,6 +17,29 @@ function copyToClipboard(value, button) {
     }, 1000); // Adjust the duration as needed
   }
   
+
+var simCardICCID = null
+var simCardKnown = false;
+function fetchSimCardData() {
+  fetch('/get-connected-sim-card-values')
+    .then(response => response.json())
+    .then(data => {
+      simCardICCID = data.sim_card_iccid;
+      simCardKnown = data.sim_card_known;
+
+      // Check if there is a known sim card
+      if(simCardKnown === false && simCardICCID !== null) {
+        document.getElementById('sim-card-iccic-lable').innerHTML = simCardICCID
+        showSimCardModal(true);
+      } else {
+        showSimCardModal(false);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+}
+
 function reloadView() {
   var accordionItems = document.querySelectorAll("#myAccordion .accordion-item");
 
@@ -60,13 +83,16 @@ function reloadView() {
         // disable buttons if no SIM detected
         var isSIMConnected = document.getElementById("statusIndicator")
                   .querySelector(".circle").classList.contains("green") ? true : false;
-        if (isSIMConnected) {
-          enableUI()
+        if (isSIMConnected === true) {
+          enableUI();    
+          fetchSimCardData();      
         } else {
-          disableUI()
+          disableUI();
+          showSimCardModal(false);
         }
+        
       } else {
-        console.error("Error retrieving profile data");
+        console.error("Error retrieving data");
       }
     }
   };
@@ -220,8 +246,105 @@ function resetProfileForm() {
   hideLoadingOverlay();
 }
 
+var simCardModalVisible = false
+var modal = null;
+function initializeModal() {
+  // Save Reference to the modal
+  var unknownSimCardModal = document.getElementById('unknown-sim-card-modal');
+  modal = new bootstrap.Modal(unknownSimCardModal, {
+    backdrop: 'static',
+    keyboard: false
+  });
+}
+function showSimCardModal(setVisible = true) {
+  if (modal === null) {
+    initializeModal();
+  }
 
-$(document).ready(function() {
+  if(setVisible) {    
+    if (simCardModalVisible === false) {
+      simCardModalVisible = true;
+      modal.show();
+    }
+  } else {    
+    if (simCardModalVisible === true) {
+      simCardModalVisible = false;
+      modal.hide();
+    }    
+  }
+}
+function validateSimCardForm() {
+  var isValid = true;
+
+  // Perform validation checks for each field
+  var admKeyInput = document.getElementById('admKeyInput');
+
+  var submitErrorVisible = (document.getElementById('submitSimCardFormError').textContent.trim() !== '');
+
+  // Validation checks for 'name' field
+  var admKeyErrorElement = document.getElementById('admKeyError');
+  if (!/^\d{8}$/.test(admKeyInput.value) && (admKeyInput.value.trim() !== '' || submitErrorVisible)) {
+    admKeyErrorElement.textContent = 'ADM Key must be exactly 8 digits';
+    isValid = false;
+  } else {
+    admKeyErrorElement.textContent = '';
+    if(admKeyInput.value.trim() === '') {
+      isValid = false;
+    }
+  }
+
+  return isValid;
+}
+
+function submitSimCardForm() {
+  showLoadingOverlay();
+
+  var form = document.getElementById('simCardForm');
+  var isValid = validateSimCardForm();
+  var submitErrorElement = document.getElementById('submitSimCardFormError');
+
+  if (isValid) {
+    var formData = $(form).serialize();
+    submitErrorElement.textContent = '';
+
+    $.ajax({
+      url: '/add-sim-card',
+      method: 'POST',
+      data: formData,
+      success: function(response) {
+        setTimeout(function() {         
+          resetSimCardForm();
+        }, 1000);
+        console.log(response);
+      },
+      error: function(xhr, status, error) {
+        console.error(error);
+        submitErrorElement.textContent = 'Please check your input values';
+        hideLoadingOverlay();
+      }
+    });
+  } else {
+    hideLoadingOverlay();
+    // Display an error message
+    submitErrorElement.textContent = 'Please check your input values';
+    validateProfileForm(); 
+    console.log('SIM card form contains invalid values');
+  }
+}
+
+function resetSimCardForm() {
+  showLoadingOverlay();
+
+  document.getElementById('simCardForm').reset();
+  document.getElementById('admKeyInput').textContent = '';
+  document.getElementById('admKeyError').textContent = '';
+
+  showSimCardModal(false);
+
+  hideLoadingOverlay();
+}
+
+$(document).ready(function() {  
   hideLoadingOverlay();
   // Add click event listener to a parent element containing profile buttons
   $("main").on("click", "button.update-profile-button", function() {

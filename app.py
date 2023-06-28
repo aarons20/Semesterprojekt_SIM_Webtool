@@ -12,8 +12,7 @@ db = DataBaseConnectivity()
 
 @app.route('/')
 @app.route('/get-updated-profiles')
-def index(): 
-    
+def index():    
     # Check what sim profile is on sim card
     profiles = None
     try:
@@ -39,30 +38,40 @@ def index():
     if sim_profile is not None:       
         active_imsi = sim_profile.imsi
     
+    # Render template
+    reader_status = sim_reader_writer.reader_status()
+    return render_template('index.html', 
+                           profiles=profiles,                                                     
+                           active_imsi = active_imsi,                           
+                           status = reader_status,
+                           SimReaderWriterStatus=SimReaderWriterStatus)
+
+@app.route('/get-connected-sim-card-values')
+def get_values():
     # Check what sim card is connected
     sim_cards = None
     try:
         sim_cards = db.getSIMCards()
     except Exception as e:
         print(str(e))
-        sim_cards = []       
-    sim_card_iccid = sim_reader_writer.get_sim_card_iccid()  
-    
-    # Render template
-    reader_status = sim_reader_writer.reader_status()
-    return render_template('index.html', 
-                           profiles=profiles,
-                           sim_cards = sim_cards,                           
-                           active_imsi = active_imsi,
-                           active_sim_card = sim_card_iccid,
-                           status = reader_status,
-                           SimReaderWriterStatus=SimReaderWriterStatus)
+          
+    sim_card_iccid = sim_reader_writer.get_sim_card_iccid()
+
+    sim_card_known = False
+    for sim_card in sim_cards:
+        if sim_card.iccid == sim_card_iccid:
+            sim_card_known = True
+            break
+    values = {
+        'sim_card_iccid': sim_card_iccid,
+        'sim_card_known': sim_card_known
+    }
+    return jsonify(values)
 
 @app.route('/write-sim-profile', methods=['POST'])
 def trigger_method():
-    print(" ======= Running request...")
     imsi = request.form.get('imsi')
-    print("Received imsi:", imsi)
+    # print("Received imsi:", imsi)
     sim_profiles = db.getSIMProfiles()
     sim_cards = db.getSIMCards()
 
@@ -73,15 +82,18 @@ def trigger_method():
             target_profile = profile
             break
 
-    # Try to write sim profile if profile found 
-    if target_profile:
-        connected_sim_iccid = sim_reader_writer.get_sim_card_iccid()
-        target_sim_card= None
-        for sim_card in sim_cards:
-            if sim_card.iccid == connected_sim_iccid:
-                target_sim_card = sim_card
-                break
+    # Find the SIMCard object with the matching 'iccid'
+    connected_sim_iccid = sim_reader_writer.get_sim_card_iccid()
+    target_sim_card= None
+    for sim_card in sim_cards:
+        if sim_card.iccid == connected_sim_iccid:
+            target_sim_card = sim_card
+            break
+    if target_sim_card is None:
+        abort(400, "Error: Unknown sim card")
 
+    # Try to write sim profile
+    if target_profile:
         trys_for_writing = 2     
         while(trys_for_writing >= 0):       
             try:   
@@ -92,12 +104,12 @@ def trigger_method():
                     time.sleep(1)
                     trys_for_writing -= 1                    
                 else:
-                    abort(400, "Error: " + str(e))
+                    abort(400, "PySim writing error: " + str(e))
     else:
         # The target_profile is not found
         abort(400, "Error: SIMProfile not found")
 
-    return 'SIM updated successfully'
+    return 'SIM card updated successfully'
 
 @app.route('/create-sim-profile', methods=['POST'])
 def create_sim_profile():
@@ -115,7 +127,23 @@ def create_sim_profile():
             )
     try:
         db.addSIMProfile(sim_profile=sim_profile)
-        return 'Success'
+        return 'SIM profile created successfully'
+    except Exception as e:
+        abort(400, str(e))
+
+@app.route('/add-sim-card', methods=['POST'])
+def add_sim_card():
+    iccid = sim_reader_writer.get_sim_card_iccid()
+    admKey = request.form.get('admKey')
+    print(f"iccid {iccid}, admKey {admKey}")
+
+    sim_card = SIMCard(        
+                iccid=iccid,
+                adm_key=admKey
+            )
+    try:
+        db.addSIMCard(sim_card=sim_card)
+        return 'SIM card added successfully'
     except Exception as e:
         abort(400, str(e))
 

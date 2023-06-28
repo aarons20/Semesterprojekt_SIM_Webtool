@@ -42,6 +42,9 @@
   </style>
 {% endblock %}
 
+{% block extra_scripts %}
+{% endblock %}
+
 {% block headerTitle %}
   SIM Writer
 {% endblock %}
@@ -101,44 +104,70 @@
 {% block modals %}
   <div class="modal" id="myModal">
     <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add a sim profile</h5>
+                <button type="button" class="btn-close" onclick="resetProfileForm()"></button>
+            </div>
+            <div class="modal-body">
+              <form id="simProfileForm" action="submitForm">
+                <div class="mb-3">
+                  <label class="form-label required">Network name</label>
+                  <input id="nameInput" type="text" class="form-control" name="name" oninput="return validateProfileForm()">
+                  <small id="nameError" class="text-danger"> </small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required">IMSI</label>
+                    <input id="imsiInput" type="text" class="form-control" name="imsi" oninput="return validateProfileForm()">
+                    <small id="imsiError" class="text-danger"> </small>
+                  </div>
+                <div class="mb-3">
+                    <label class="form-label required">KI</label>
+                    <input id="kiInput" type="text" class="form-control" name="ki" oninput="return validateProfileForm()">
+                    <small id="kiError" class="text-danger"> </small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label required">OPC</label>
+                    <input id="opcInput" type="text" class="form-control" name="opc" oninput="return validateProfileForm()">
+                    <small id="opcError" class="text-danger"> </small>
+                </div>                
+              </form>                             
+            </div>
+            <div class="modal-footer">
+              <div class="submit-error-container">
+                <small id="submitError" class="text-danger"></small>
+              </div>
+              <button type="submit" class="btn btn-primary" onclick="submitProfileForm()">Submit</button>
+              <button type="cancel" class="btn btn-secondary" onclick="resetProfileForm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="modal" id="unknown-sim-card-modal" data-bs-backdrop="static">
+    <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title">Add a sim profile</h5>
-                  <button type="button" class="btn-close" onclick="resetProfileForm()"></button>
+                  <h5 class="modal-title">Unknown sim card detected</h5>                  
               </div>
               <div class="modal-body">
-                <form id="simProfileForm" action="submitForm">
+                <form id="simCardForm">
                   <div class="mb-3">
-                    <label class="form-label required">Network name</label>
-                    <input id="nameInput" type="text" class="form-control" name="name" oninput="return validateProfileForm()">
-                    <small id="nameError" class="text-danger"> </small>
+                    <p>The SIM card with ICCID <strong id="sim-card-iccic-lable">excample</strong> was detected. Please enter the corresponding ADM key.</p>
                   </div>
                   <div class="mb-3">
-                      <label class="form-label required">IMSI</label>
-                      <input id="imsiInput" type="text" class="form-control" name="imsi" oninput="return validateProfileForm()">
-                      <small id="imsiError" class="text-danger"> </small>
-                    </div>
-                  <div class="mb-3">
-                      <label class="form-label required">KI</label>
-                      <input id="kiInput" type="text" class="form-control" name="ki" oninput="return validateProfileForm()">
-                      <small id="kiError" class="text-danger"> </small>
-                  </div>
-                  <div class="mb-3">
-                      <label class="form-label required">OPC</label>
-                      <input id="opcInput" type="text" class="form-control" name="opc" oninput="return validateProfileForm()">
-                      <small id="opcError" class="text-danger"> </small>
-                  </div>                
+                      <label class="form-label required">ADM Key</label>
+                      <input id="admKeyInput" type="text" class="form-control" name="admKey" oninput="return validateSimCardForm()">
+                      <small id="admKeyError" class="text-danger"> </small>
+                   </div>               
                 </form>                             
               </div>
               <div class="modal-footer">
                 <div class="submit-error-container">
-                  <small id="submitError" class="text-danger"></small>
+                  <small id="submitSimCardFormError" class="text-danger"></small>
                 </div>
-                <button type="submit" class="btn btn-primary" onclick="submitProfileForm()">Submit</button>
-                <button type="cancel" class="btn btn-secondary" onclick="resetProfileForm()">Cancel</button>
+                <button type="submit" class="btn btn-primary" onclick="submitSimCardForm()">Submit</button>                
               </div>
           </div>
       </div>
     </div>
-  </div>
 {% endblock %}
