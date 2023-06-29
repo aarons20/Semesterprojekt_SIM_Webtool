@@ -5,6 +5,7 @@ instance/
 .vscode/
 
 # Dateien
+*db
 *.pyc 
 *.pyo
 *.pyd

@@ -1,4 +1,4 @@
-# SIM Profile Writer
+# SIM Writer
 
 This is a web application built with Python and Flask that allows users to write SIM profiles to SIM cards. It provides a user-friendly interface to configure and manage SIM profiles.
 

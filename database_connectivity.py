@@ -8,7 +8,7 @@ from models.sim_card import SIMCard
 class DataBaseConnectivity:    
     # Initializing
     def __init__(self):
-        self._engine = create_engine('sqlite:///instance/database.db')
+        self._engine = create_engine('sqlite:///database.db')
         Session = sessionmaker(bind=self._engine)
         self._session = Session()
 
